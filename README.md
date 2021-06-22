@@ -52,7 +52,7 @@ ncnnqat is a quantize aware training package for NCNN on pytorch.
   suggest finetuning from a well-trained model, register_quantization_hook and merge_freeze_bn at beginning. do it after a few epochs of training otherwise.
 
   ```python
-  from ncnnqat import quant_dequant_weight, unquant_weight, merge_freeze_bn, register_quantization_hook
+  from ncnnqat import unquant_weight, merge_freeze_bn, register_quantization_hook
   ...
   ...
       for epoch in range(epoch_train):
