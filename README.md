@@ -113,7 +113,6 @@ ncnnqat is a quantize aware training package for NCNN on pytorch.
   ...
   ```
 
-* Using EMA with caution(Not recommended).
 
 <div id="code-examples"></div>
 
