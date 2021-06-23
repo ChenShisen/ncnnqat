@@ -241,7 +241,7 @@ def _quantizing_activation_ncnn(module, input):
             input.to(input_type)
         list_modified.append(input)
     tuple_input = tuple(list_modified)  
-    return(tuple_input) 
+    return tuple_input
 def _quantizing_weight_ncnn(module, input):
     """ quantize per-channel weight before layer calculate.
 
