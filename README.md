@@ -28,7 +28,7 @@ ncnnqat is a quantize aware training package for NCNN on pytorch.
   * pytorch >= 1.6
   * numpy >= 1.18.1
   * onnx >= 1.7.0
-  * onnx-simplifier >= 0.3.5
+  * onnx-simplifier >= 0.3.6
 
 * Install ncnnqat via pypi:  
   ```shell
