@@ -47,20 +47,20 @@ ncnnqat is a quantize aware training package for NCNN on pytorch.
 ## Usage
 
 
-* merge bn weight into conv and freeze bn
+* register_quantization_hook and merge_freeze_bn
 
-  suggest finetuning from a well-trained model, register_quantization_hook and merge_freeze_bn at beginning. do it after a few epochs of training otherwise.
+  (suggest finetuning from a well-trained model, do it after a few epochs of training otherwise.)
 
   ```python
   from ncnnqat import unquant_weight, merge_freeze_bn, register_quantization_hook
   ...
   ...
       for epoch in range(epoch_train):
-		  model.train()
-		  if epoch==well_epoch:
-			  register_quantization_hook(model)
-		  if epoch>=well_epoch:
-			  model = merge_freeze_bn(model)  #it will change bn to eval() mode during training
+          model.train()
+	  if epoch==well_epoch:
+	      register_quantization_hook(model)
+	  if epoch>=well_epoch:
+	      model = merge_freeze_bn(model)  #it will change bn to eval() mode during training
   ...
   ```
 
@@ -68,8 +68,9 @@ ncnnqat is a quantize aware training package for NCNN on pytorch.
 
   ```python
   ...
-  ...
-      model.apply(unquant_weight)  # using original weight while updating
+  ... 
+      if epoch>=well_epoch:
+          model.apply(unquant_weight)  # using original weight while updating
       optimizer.step()
   ...
   ```
@@ -81,12 +82,12 @@ ncnnqat is a quantize aware training package for NCNN on pytorch.
   ...
   ...
       onnx_path = "./xxx/model.onnx"
-	  table_path="./xxx/model.table"
-	  dummy_input = torch.randn(1, 3, img_size, img_size, device='cuda')
+      table_path="./xxx/model.table"
+      dummy_input = torch.randn(1, 3, img_size, img_size, device='cuda')
       input_names = [ "input" ]
       output_names = [ "fc" ]
       torch.onnx.export(model, dummy_input, onnx_path, verbose=False, input_names=input_names, output_names=output_names)
-	  save_table(model,onnx_path=onnx_path,table=table_path)
+      save_table(model,onnx_path=onnx_path,table=table_path)
 
   ...
   ```
@@ -96,18 +97,18 @@ ncnnqat is a quantize aware training package for NCNN on pytorch.
   ...
   ...
       model_s = new_net() #
-	  model_s.cuda()
-	  register_quantization_hook(model_s)
-	  #model_s = merge_freeze_bn(model_s)
+      model_s.cuda()
+      register_quantization_hook(model_s)
+      #model_s = merge_freeze_bn(model_s)
       onnx_path = "./xxx/model.onnx"
-	  table_path="./xxx/model.table"
-	  dummy_input = torch.randn(1, 3, img_size, img_size, device='cuda')
+      table_path="./xxx/model.table"
+      dummy_input = torch.randn(1, 3, img_size, img_size, device='cuda')
       input_names = [ "input" ]
       output_names = [ "fc" ]
-	  model_s.load_state_dict({k.replace('module.',''):v for k,v in model.state_dict().items()}) #model_s = model     model = nn.DataParallel(model)
+      model_s.load_state_dict({k.replace('module.',''):v for k,v in model.state_dict().items()}) #model_s = model     model = nn.DataParallel(model)
             
       torch.onnx.export(model_s, dummy_input, onnx_path, verbose=False, input_names=input_names, output_names=output_names)
-	  save_table(model_s,onnx_path=onnx_path,table=table_path)
+      save_table(model_s,onnx_path=onnx_path,table=table_path)
 	  
 
   ...
