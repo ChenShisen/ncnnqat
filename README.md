@@ -148,7 +148,11 @@ ncnnqat is a quantize aware training package for NCNN on pytorch.
     | resnet18 | 0.94   | 0.93333   | 0.9367 | 0.937|
 
 
-* SSD300(resnet18)
+* SSD300(resnet18|coco)
+   
+    ```
+    ln -s /your_coco_path/coco ./tests/ssd300/data
+    ```
 
     ```
     fp32:
