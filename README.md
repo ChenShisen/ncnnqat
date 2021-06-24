@@ -124,7 +124,8 @@ ncnnqat is a quantize aware training package for NCNN on pytorch.
   
   SSD300 quantization aware training example.
   
-  ```python -m torch.distributed.launch \
+  ```
+     python -m torch.distributed.launch \
       --nproc_per_node=4 \
       --nnodes=1 \
       --node_rank=0 \
