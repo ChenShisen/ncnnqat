@@ -123,7 +123,10 @@ ncnnqat is a quantize aware training package for NCNN on pytorch.
   ```python test/test_cifar10.py```
   
   SSD300 quantization aware training example.
-  
+     
+  ```
+     ln -s /your_coco_path/coco ./tests/ssd300/data
+  ```
   ```
      python -m torch.distributed.launch \
       --nproc_per_node=4 \
@@ -149,10 +152,7 @@ ncnnqat is a quantize aware training package for NCNN on pytorch.
 
 
 * SSD300(resnet18|coco)
-   
-    ```
-    ln -s /your_coco_path/coco ./tests/ssd300/data
-    ```
+
 
     ```
     fp32:
