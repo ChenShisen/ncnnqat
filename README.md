@@ -121,6 +121,15 @@ ncnnqat is a quantize aware training package for NCNN on pytorch.
   Cifar10 quantization aware training example.
 
   ```python test/test_cifar10.py```
+  
+  SSD300 quantization aware training example.
+  
+  ```python -m torch.distributed.launch \
+      --nproc_per_node=4 \
+      --nnodes=1 \
+      --node_rank=0 \
+      ./tests/ssd300/main.py \
+      -d ./tests/ssd300/data/coco```
 
 <div id="results"></div>
 
@@ -137,9 +146,37 @@ ncnnqat is a quantize aware training package for NCNN on pytorch.
     | resnet18 | 0.94   | 0.93333   | 0.9367 | 0.937|
 
 
-* coco
+* SSD300(resnet18)
 
-  ....
+    fp32:
+	 Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.193
+	 Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.344
+	 Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.191
+	 Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.042
+	 Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.195
+	 Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.328
+	 Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.199
+	 Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.293
+	 Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.309
+	 Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.084
+	 Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.326
+	 Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.501
+	Current AP: 0.19269
+
+    ncnnqat:
+	 Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.192
+	 Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.342
+	 Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.194
+	 Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.041
+	 Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.194
+	 Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.327
+	 Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.197
+	 Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.291
+	 Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.307
+	 Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.082
+	 Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.325
+	 Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.497
+	Current AP: 0.19202
 
 
 <div id="todo"></div>
