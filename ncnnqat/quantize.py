@@ -210,6 +210,7 @@ def _quantizing_activation_ncnn(module, input):
     #print("input.shape",input[0].shape)
     aciq = 0
     quant_handle = FakeQuantCuda(type=0,bit_width=8,c=1)
+    list_modified = []
     if isinstance(input, tuple):
         for item in input:
             aciq = 0
@@ -217,7 +218,7 @@ def _quantizing_activation_ncnn(module, input):
             if item.numel()/item.shape[0]>8000:
                 aciq = 1
             #quant_tuple = quant_handle(item.float(),module.activation_scale.data.detach().clone())
-            quant_tuple = quant_handle(item,module.activation_scale.data.detach().clone(),tensor_movMax=module.activation_movMax.data.detach().clone(),aciq=aciq)
+            quant_tuple = quant_handle(item.float(),module.activation_scale.data.detach().clone(),tensor_movMax=module.activation_movMax.data.detach().clone(),aciq=aciq)
             item = quant_tuple[0]
             if item.dtype!=item_type:
                 #print(item.dtype,item_type)
@@ -225,15 +226,22 @@ def _quantizing_activation_ncnn(module, input):
             module.activation_scale.data = quant_tuple[1]
             module.activation_movMax.data = quant_tuple[2]
             #print(quant_tuple[2])
+            list_modified.append(item)
 
     else:
+        input_type = input.dtype
         if input.numel()/input.shape[0]>8000:
             aciq = 1
         #quant_tuple = quant_handle(input.float(),module.activation_scale.data.detach().clone())
-        quant_tuple = quant_handle(input,module.activation_scale.data.detach().clone(),tensor_movMax=module.activation_movMax.data.detach().clone(),aciq=aciq)
+        quant_tuple = quant_handle(input.float(),module.activation_scale.data.detach().clone(),tensor_movMax=module.activation_movMax.data.detach().clone(),aciq=aciq)
         input = quant_tuple[0]
         module.activation_scale.data = quant_tuple[1]
         module.activation_movMax.data = quant_tuple[2]
+        if input.dtype!=input_type:
+            input.to(input_type)
+        list_modified.append(input)
+    tuple_input = tuple(list_modified)  
+    return tuple_input
 def _quantizing_weight_ncnn(module, input):
     """ quantize per-channel weight before layer calculate.
 
