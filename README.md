@@ -135,6 +135,9 @@ ncnnqat is a quantize aware training package for NCNN on pytorch.
       ./tests/ssd300/main.py \
       -d ./tests/ssd300/data/coco
   ```
+  ```
+      python ./tests/ssd300/main.py --onnx_save  #load model dict, export onnx and ncnn table
+  ```
 
 <div id="results"></div>
 
