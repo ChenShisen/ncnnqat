@@ -148,6 +148,7 @@ ncnnqat is a quantize aware training package for NCNN on pytorch.
 
 * SSD300(resnet18)
 
+
     fp32:
 	 Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.193
 	 Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.344
@@ -177,6 +178,7 @@ ncnnqat is a quantize aware training package for NCNN on pytorch.
 	 Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.325
 	 Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.497
 	Current AP: 0.19202
+
 
 
 <div id="todo"></div>
