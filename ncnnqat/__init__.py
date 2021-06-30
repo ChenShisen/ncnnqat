@@ -1,5 +1,3 @@
-""" quantize aware training package for  Neural Network Inference Engine(NNIE) on pytorch.
-"""
 import sys
 try:
     from .quantize import  unquant_weight, freeze_bn, \
