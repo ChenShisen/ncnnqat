@@ -25,35 +25,33 @@ __global__ void max_reduce(float* __restrict__ data,float* out_ptr,int width,int
 
 
 __global__ void fake_quantize_layer_google(float* __restrict__ a,
-										float* o,  
-                                        float* o1,
-										float* movMax,
-										int size,
-										int bit_width,
-										float* max_entry);
+					   float* o,  
+                                           float* o1,
+					   float* movMax,
+				           int size,
+					   int bit_width,
+					   float* max_entry);
 __global__ void fake_quantize_layer_aciq(float* __restrict__ a,
-										float* o,  
-                                        float* o1,
-										float* movMax,
-										int feature_pixl_num,
-										int size,
-										int bit_width,
-										float* max_entry);
+					 float* o,  
+                                         float* o1,
+					 float* movMax,
+				         int feature_pixl_num,
+					 int size,
+					 int bit_width,
+					 float* max_entry);
 
 __global__ void fake_quantize_channel_cuda(float* __restrict__ a,
-                                            float* o,  
-                                            float* o1,  
-											int size,
-											int bit_width,
-											float* max_entry_arr,
-											int channel_num
-											);
+                                           float* o,  
+                                           float* o1,  
+					   int size,
+				           int bit_width,
+					   float* max_entry_arr,
+					   int channel_num);
 __global__ void fake_quantize_channel_aciq(float* __restrict__ a,
-                                            float* o,  
-                                            float* o1,  
-											int size,
-											int bit_width,
-											float* max_entry_arr,
-											int channel_num
-											);
+                                           float* o,  
+                                           float* o1,  
+					   int size,
+					   int bit_width,
+					   float* max_entry_arr,
+					   int channel_num);
 
