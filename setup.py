@@ -50,7 +50,7 @@ setup(
       "torch >= 1.5",
       "numpy >= 1.18.1",
       "onnx >= 1.7.0",
-      "onnx-simplifier >= 0.3.5"
+      "onnx-simplifier >= 0.3.6"
     ],
     extras_require={
         'test': ["torchvision>=0.4",
