@@ -49,7 +49,7 @@ __global__ void fake_quantize_layer_google(float* __restrict__ a,
     {
 	float momenta = 0.95; 
 	float mov_max_tmp = movMax[0];
-	if(mov_max_tmp==0.) mov_max_tmp=fabs(*max_entry);  //movMax dafault 0 ,now first step set it a non zero data
+	if(mov_max_tmp<1e-15) mov_max_tmp=fabs(*max_entry);  //movMax dafault 0 ,now first step set it a non zero data
 	else  mov_max_tmp= mov_max_tmp * momenta + fabs(*max_entry) * (1.-momenta);  // #GOOGLE QAT : movMax = movMax*momenta + max(abs(tensor))*(1-momenta)    momenta = 0.95
         float data_scale = __powf(2.,bit_width-1.)-1;
 		
@@ -87,7 +87,7 @@ __global__ void fake_quantize_layer_aciq(float* __restrict__ a,
     {
         float momenta = 0.95; 
         float mov_max_tmp = movMax[0];
-        if(mov_max_tmp==0.) mov_max_tmp=fabs(*max_entry);  //movMax dafault 0 ,now first step set it a non zero data
+        if(mov_max_tmp<1e-15) mov_max_tmp=fabs(*max_entry);  //movMax dafault 0 ,now first step set it a non zero data
         else  mov_max_tmp= fabs(*max_entry);//mov_max_tmp * momenta + fabs(*max_entry) * (1.-momenta);  // #GOOGLE QAT : movMax = movMax*momenta + max(abs(tensor))*(1-momenta)    momenta = 0.95
         float data_scale = __powf(2.,bit_width-1.)-1;
 		
@@ -198,7 +198,7 @@ std::vector<Tensor> fake_quantize_activate_cuda(Tensor a, int bit_width ,int aci
 							     bit_width,
 							     max_entry.data_ptr<float>());
     }
-    else // movmax + aciq
+    else // aciq
     {
 	//printf("layer_aciq....");
 	fake_quantize_layer_aciq<<<blockNums, blockSize>>>(a.data_ptr<float>(),
