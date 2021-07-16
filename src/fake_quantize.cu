@@ -187,7 +187,7 @@ std::vector<Tensor> fake_quantize_activate_cuda(Tensor a, int bit_width ,int aci
     Tensor max_entry = at::max(at::abs(a));
     int blockNums = (size + blockSize - 1) / blockSize;
 	
-    if(aciq==0)
+    if(aciq==0) //movmax
     {
 	//printf("layer_max....");
 	fake_quantize_layer_google<<<blockNums, blockSize>>>(a.data_ptr<float>(),
@@ -198,7 +198,7 @@ std::vector<Tensor> fake_quantize_activate_cuda(Tensor a, int bit_width ,int aci
 							     bit_width,
 							     max_entry.data_ptr<float>());
     }
-    else
+    else // movmax + aciq
     {
 	//printf("layer_aciq....");
 	fake_quantize_layer_aciq<<<blockNums, blockSize>>>(a.data_ptr<float>(),
@@ -262,6 +262,11 @@ std::vector<Tensor> fake_quantize_weight_cuda(Tensor a, int bit_width,int c ,int
 
 std::vector<Tensor> fake_quantize_cuda(Tensor a, int bit_width,int type,int c,int aciq) 
 {
+    /*
+    https://arxiv.org/pdf/1806.08342.pdf  2.5
+    For weights,we use the actual minimum and maximum values to determine the quantizer parameters. 
+    For activations, we use the moving average of the minimum and maximum values across batches to determine the quantizer parameters.
+    */
     if(type==0) return fake_quantize_activate_cuda(a,bit_width,aciq); //type==0 per layer	
     else return fake_quantize_weight_cuda(a,bit_width,c,aciq); //type==1 perchannel
 }
