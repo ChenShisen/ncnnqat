@@ -4,7 +4,7 @@
 __global__ void max_reduce(float* __restrict__ data,float* out_ptr,int width,int lg_n) //preset data[i] >=0 
 {
     __shared__ float* middleware[blockSize];                                
-    float min_positive_float = 1e-15;                                       
+    float min_positive_float = 1e-6;                                       
     int Row = blockIdx.x * width + threadIdx.x;                             
     int bid = blockIdx.x;                                                   
     int tid = threadIdx.x;                                                  
@@ -49,12 +49,12 @@ __global__ void fake_quantize_layer_google(float* __restrict__ a,
     {
 	float momenta = 0.95; 
 	float mov_max_tmp = movMax[0];
-	if(mov_max_tmp<1e-15) mov_max_tmp=fabs(*max_entry);  //movMax dafault 0 ,now first step set it a non zero data
+	if(mov_max_tmp<1e-6) mov_max_tmp=fabs(*max_entry);  //movMax dafault 0 ,now first step set it a non zero data
 	else  mov_max_tmp= mov_max_tmp * momenta + fabs(*max_entry) * (1.-momenta);  // #GOOGLE QAT : movMax = movMax*momenta + max(abs(tensor))*(1-momenta)    momenta = 0.95
         float data_scale = __powf(2.,bit_width-1.)-1;
 		
 	float scale;
-        if(mov_max_tmp < 1e-15) scale =  __fdividef(data_scale,1e-15);
+        if(mov_max_tmp < 1e-6) scale =  __fdividef(data_scale,1e-6);
 	else scale =  __fdividef(data_scale,mov_max_tmp);
 			
 	int o_int = round(a[index]*scale);
@@ -87,7 +87,7 @@ __global__ void fake_quantize_layer_aciq(float* __restrict__ a,
     {
         float momenta = 0.95; 
         float mov_max_tmp = movMax[0];
-        if(mov_max_tmp<1e-15) mov_max_tmp=fabs(*max_entry);  //movMax dafault 0 ,now first step set it a non zero data
+        if(mov_max_tmp<1e-6) mov_max_tmp=fabs(*max_entry);  //movMax dafault 0 ,now first step set it a non zero data
         else  mov_max_tmp= fabs(*max_entry);//mov_max_tmp * momenta + fabs(*max_entry) * (1.-momenta);  // #GOOGLE QAT : movMax = movMax*momenta + max(abs(tensor))*(1-momenta)    momenta = 0.95
         float data_scale = __powf(2.,bit_width-1.)-1;
 		
@@ -97,7 +97,7 @@ __global__ void fake_quantize_layer_aciq(float* __restrict__ a,
         float threshold = (float)(alpha_gaussian[bit_width - 1] * std);
 		
         float scale;
-        if(threshold < 1e-15) scale =  __fdividef(data_scale,1e-15);
+        if(threshold < 1e-6) scale =  __fdividef(data_scale,1e-6);
         else scale =  __fdividef(data_scale,threshold);
 	//float o_index = __fdividef(round(a[index]*scale),scale);
 	int o_int = round(a[index]*scale);
@@ -129,10 +129,10 @@ __global__ void fake_quantize_channel_aciq(float* __restrict__ a,
 	int channel = index/channel_num;
 	float* max_entry = max_entry_arr+channel;
 	float data_scale = __powf(2.,bit_width-1.)-1;
-        if((*max_entry) < 1e-15)
+        if((*max_entry) < 1e-6)
 	{
 	    //if(index%channel_num==0) o1[channel] = scale;
-	    *max_entry = 1e-15;
+	    *max_entry = 1e-6;
             //return;
         }
 	const float alpha_gaussian[8] = {0, 1.71063519, 2.15159277, 2.55913646, 2.93620062, 3.28691474, 3.6151146, 3.92403714};
@@ -163,10 +163,10 @@ __global__ void fake_quantize_channel_cuda(float* __restrict__ a,
 	int channel = index/channel_num;
 	float* max_entry = max_entry_arr+channel;
 	float data_scale = __powf(2.,bit_width-1.)-1;
-        if((*max_entry) < 1e-15)
+        if((*max_entry) < 1e-6)
 	{
 	    //if(index%channel_num==0) o1[channel] = scale;
-	    *max_entry = 1e-15;
+	    *max_entry = 1e-6;
             //return;
         }
 	float scale =  __fdividef(data_scale,*max_entry);
@@ -266,6 +266,7 @@ std::vector<Tensor> fake_quantize_cuda(Tensor a, int bit_width,int type,int c,in
     https://arxiv.org/pdf/1806.08342.pdf  2.5
     For weights,we use the actual minimum and maximum values to determine the quantizer parameters. 
     For activations, we use the moving average of the minimum and maximum values across batches to determine the quantizer parameters.
+    float 6 7 ,double 15 16
     */
     if(type==0) return fake_quantize_activate_cuda(a,bit_width,aciq); //type==0 per layer	
     else return fake_quantize_weight_cuda(a,bit_width,c,aciq); //type==1 perchannel
