@@ -8,7 +8,10 @@
 #include <ATen/ATen.h>
 #include <torch/torch.h>
 #include <vector>
-#define blockSize 1024
+
+const int blockSize = 1024;
+//#define blockSize 1024
+
 using namespace at;
 
 
