@@ -67,7 +67,7 @@ __global__ void fake_quantize_layer_google(float* __restrict__ a,
 	if(index==0) 
 	{
 	    o1[0] = scale;
-	    movMax[0] = mov_max_tmp;
+	    mov_max[0] = mov_max_tmp;
 	}
     }
 }
