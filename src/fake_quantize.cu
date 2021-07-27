@@ -4,22 +4,22 @@
 __global__ void max_reduce(float* __restrict__ data,float* out_ptr,int width,int lg_n) //preset data[i] >=0 
 {
     __shared__ float* middleware[blockSize];                                
-    float min_positive_float = 1e-6;                                       
-    int Row = blockIdx.x * width + threadIdx.x;                             
+    const float min_positive_float = 1e-6;                                       
+    int row = blockIdx.x * width + threadIdx.x;                             
     int bid = blockIdx.x;                                                   
     int tid = threadIdx.x;                                                  
     int tid_tmp = threadIdx.x;                                              
 
-    //if(tid<width) {middleware[tid] = &(data[Row]);}                       
-    if(tid<width) middleware[tid] = data+Row;                               
+    //if(tid<width) {middleware[tid] = &(data[row]);}                       
+    if(tid<width) middleware[tid] = data+row;                               
     else middleware[tid] = &min_positive_float;                             
-    Row+=blockSize;                                                         
+    row+=blockSize;                                                         
     tid_tmp +=blockSize;                                                    
     while(tid_tmp<width)                                                    
     {
-        //if(data[Row]>*(middleware[tid])) middleware[tid] = &(data[Row]);
-	if(fabs(data[Row])>fabs(*(middleware[tid]))) middleware[tid] = data+Row;
-	Row+=blockSize;                                                     
+        //if(data[row]>*(middleware[tid])) middleware[tid] = &(data[Row]);
+	if(fabs(data[Row])>fabs(*(middleware[tid]))) middleware[tid] = data+row;
+	row+=blockSize;                                                     
 	tid_tmp +=blockSize;
     }
     __syncthreads();                                                        
@@ -47,7 +47,7 @@ __global__ void fake_quantize_layer_google(float* __restrict__ a,
     int index = blockIdx.x * blockDim.x + threadIdx.x;
     if (index < size) 
     {
-	float momenta = 0.95; 
+	const float momenta = 0.95; 
 	float mov_max_tmp = movMax[0];
 	if(mov_max_tmp<1e-6) mov_max_tmp=fabs(*max_entry);  //movMax dafault 0 ,now first step set it a non zero data
 	else  mov_max_tmp= mov_max_tmp * momenta + fabs(*max_entry) * (1.-momenta);  // #GOOGLE QAT : movMax = movMax*momenta + max(abs(tensor))*(1-momenta)    momenta = 0.95
@@ -85,7 +85,7 @@ __global__ void fake_quantize_layer_aciq(float* __restrict__ a,
     int index = blockIdx.x * blockDim.x + threadIdx.x;
     if (index < size) 
     {
-        float momenta = 0.95; 
+        const float momenta = 0.95; 
         float mov_max_tmp = movMax[0];
         if(mov_max_tmp<1e-6) mov_max_tmp=fabs(*max_entry);  //movMax dafault 0 ,now first step set it a non zero data
         else  mov_max_tmp= fabs(*max_entry);//mov_max_tmp * momenta + fabs(*max_entry) * (1.-momenta);  // #GOOGLE QAT : movMax = movMax*momenta + max(abs(tensor))*(1-momenta)    momenta = 0.95
