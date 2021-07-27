@@ -39,7 +39,7 @@ __global__ void max_reduce(float* __restrict__ data,float* out_ptr,int width,int
 __global__ void fake_quantize_layer_google(float* __restrict__ a,
                                            float* o,  
                                            float* o1,  
-                                           float* movMax,  
+                                           float* mov_max,  
 					   int size,
 					   int bit_width,
 					   float* max_entry) 
@@ -48,7 +48,7 @@ __global__ void fake_quantize_layer_google(float* __restrict__ a,
     if (index < size) 
     {
 	const float momenta = 0.95; 
-	float mov_max_tmp = movMax[0];
+	float mov_max_tmp = mov_max[0];
 	if(mov_max_tmp<1e-6) mov_max_tmp=fabs(*max_entry);  //movMax dafault 0 ,now first step set it a non zero data
 	else  mov_max_tmp= mov_max_tmp * momenta + fabs(*max_entry) * (1.-momenta);  // #GOOGLE QAT : movMax = movMax*momenta + max(abs(tensor))*(1-momenta)    momenta = 0.95
         float data_scale = __powf(2.,bit_width-1.)-1;
@@ -76,7 +76,7 @@ __global__ void fake_quantize_layer_google(float* __restrict__ a,
 __global__ void fake_quantize_layer_aciq(float* __restrict__ a,
                                          float* o,  
                                          float* o1,  
-                                         float* movMax,
+                                         float* mov_max,
                                          int feature_pixl_num,											
 					 int size,
 					 int bit_width,
@@ -86,7 +86,7 @@ __global__ void fake_quantize_layer_aciq(float* __restrict__ a,
     if (index < size) 
     {
         const float momenta = 0.95; 
-        float mov_max_tmp = movMax[0];
+        float mov_max_tmp = mov_max[0];
         if(mov_max_tmp<1e-6) mov_max_tmp=fabs(*max_entry);  //movMax dafault 0 ,now first step set it a non zero data
         else  mov_max_tmp= fabs(*max_entry);//mov_max_tmp * momenta + fabs(*max_entry) * (1.-momenta);  // #GOOGLE QAT : movMax = movMax*momenta + max(abs(tensor))*(1-momenta)    momenta = 0.95
         float data_scale = __powf(2.,bit_width-1.)-1;
@@ -110,7 +110,7 @@ __global__ void fake_quantize_layer_aciq(float* __restrict__ a,
 	if(index==0) 
 	{
 	    o1[0] = scale;
-	    movMax[0] = mov_max_tmp;
+	    mov_max[0] = mov_max_tmp;
 	}
     }
 }
@@ -178,7 +178,7 @@ std::vector<Tensor> fake_quantize_activate_cuda(Tensor a, int bit_width ,int aci
 {
     auto o = at::zeros_like(a); //q out
     auto o1 = at::zeros({1}, a.options());  //scale
-    auto movMax = at::zeros({1}, a.options());  //max of tensor  #GOOGLE QAT  movMax = movMax*momenta + max(abs(tensor))*(1-momenta)    momenta = 0.95
+    auto mov_max = at::zeros({1}, a.options());  //max of tensor  #GOOGLE QAT  movMax = movMax*momenta + max(abs(tensor))*(1-momenta)    momenta = 0.95
     int64_t size = a.numel();
 	
     int batch_size = a.size(0);//batchsize
@@ -193,7 +193,7 @@ std::vector<Tensor> fake_quantize_activate_cuda(Tensor a, int bit_width ,int aci
 	fake_quantize_layer_google<<<blockNums, blockSize>>>(a.data_ptr<float>(),
 							     o.data_ptr<float>(),
 							     o1.data_ptr<float>(),
-							     movMax.data_ptr<float>(),
+							     mov_max.data_ptr<float>(),
 							     size,
 							     bit_width,
 							     max_entry.data_ptr<float>());
@@ -204,13 +204,13 @@ std::vector<Tensor> fake_quantize_activate_cuda(Tensor a, int bit_width ,int aci
 	fake_quantize_layer_aciq<<<blockNums, blockSize>>>(a.data_ptr<float>(),
 							   o.data_ptr<float>(),
 							   o1.data_ptr<float>(),
-							   movMax.data_ptr<float>(),
+							   mov_max.data_ptr<float>(),
 							   feature_pixl_num,
 							   size,
 							   bit_width,
 							   max_entry.data_ptr<float>());
     }
-    return {o,o1,movMax};
+    return {o,o1,mov_max};
 }
 
 
